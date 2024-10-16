@@ -31,6 +31,8 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #END_LEGAL
 
+# IMPORTANT Esse script apenas tem o objetivo de integrar o GDB com o Pin
+
 import gdb
 import re
 import sys

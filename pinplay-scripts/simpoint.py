@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 #
-#BEGIN_LEGAL 
-#BSD License 
+#BEGIN_LEGAL
+#BSD License
 #
 #Copyright (c)2022 Intel Corporation. All rights reserved.
 #
-#Redistribution and use in source and binary forms, with or without modification, 
+#Redistribution and use in source and binary forms, with or without modification,
 # are permitted provided that the following conditions are met:
 #
-#1. Redistributions of source code must retain the above copyright notice, 
+#1. Redistributions of source code must retain the above copyright notice,
 #   this list of conditions and the following disclaimer.
 #
-#2. Redistributions in binary form must reproduce the above copyright notice, 
-#   this list of conditions and the following disclaimer in the documentation 
+#2. Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
 #   and/or other materials provided with the distribution.
 #
-#3. Neither the name of the copyright holder nor the names of its contributors 
-#   may be used to endorse or promote products derived from this software without 
+#3. Neither the name of the copyright holder nor the names of its contributors
+#   may be used to endorse or promote products derived from this software without
 #   specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 # DISCLAIMED.
 # IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -112,10 +112,11 @@ class SimPoint(object):
             msg.PrintMsgPlus('WARNING: Option \'--combine\' detected without \'--ldv\'.  Only using BBV for ' \
                 'Simpoint.  \n              Must explicitly specify \'--ldv\' in order to use both BBV/LDV.\n')
         if options.ldv:
-            msg.PrintMsgPlus('Using both BBV/LDV files when running Simpoint\n')
+            msg.PrintMsgPlus(
+                'Using both BBV/LDV files when running Simpoint\n')
 
         # If option combine is not set, then set it to the default value.
-        # Check to make sure combine an acceptable value.  
+        # Check to make sure combine an acceptable value.
         #
         util.SetCombineDefault(options)
         util.CheckCombine(options)
@@ -130,25 +131,29 @@ class SimPoint(object):
         #
         if options.bbv_file == '':
             msg.PrintAndExit(
-                'Basic block vector file must be defined with option: --bbv_file FILE')
-        if options.warmup_factor != 0 and  not options.pccount_regions:
+                'Basic block vector file must be defined with option: --bbv_file FILE'
+            )
+        if options.warmup_factor != 0 and not options.pccount_regions:
             msg.PrintAndExit(
                 '--warmup_factor can only be specified with --pccount_regions')
         if options.data_dir == '':
             msg.PrintAndExit(
-                'Simpoint data directory must be defined with option: --data_dir DIR')
+                'Simpoint data directory must be defined with option: --data_dir DIR'
+            )
         if options.simpoint_file == '':
             msg.PrintAndExit(
-                'Simpoint output must be defined with option: --simpoint_file FILE')
+                'Simpoint output must be defined with option: --simpoint_file FILE'
+            )
 
         # The data_dir should exist and contain the BBV file.
         #
         if not os.path.isdir(options.data_dir):
-            msg.PrintAndExit(
-                'Data directory does not exist: ' + options.data_dir)
-        if not os.path.isfile(os.path.join(options.data_dir, options.bbv_file)):
-            msg.PrintAndExit(
-                'Basic block vector file does not exist: ' + options.bbv_file)
+            msg.PrintAndExit('Data directory does not exist: ' +
+                             options.data_dir)
+        if not os.path.isfile(os.path.join(options.data_dir,
+                                           options.bbv_file)):
+            msg.PrintAndExit('Basic block vector file does not exist: ' +
+                             options.bbv_file)
 
         # Do some 'special' things on native Windows.
         #
@@ -178,8 +183,9 @@ class SimPoint(object):
         try:
             fp_error = open(output_file, 'w')
         except IOError:
-            msg.PrintMsg('ERROR: Failed to open normalize/project error file:\n'
-                         '   ' + output_file)
+            msg.PrintMsg(
+                'ERROR: Failed to open normalize/project error file:\n'
+                '   ' + output_file)
             return -1
         try:
             fp_out = open(self.proj_bbv_file, 'w')
@@ -231,8 +237,9 @@ class SimPoint(object):
         try:
             fp_error = open(output_file, 'w')
         except IOError:
-            msg.PrintMsg('ERROR: Failed to open normalize weights error file:\n'
-                         '   ' + output_file)
+            msg.PrintMsg(
+                'ERROR: Failed to open normalize weights error file:\n'
+                '   ' + output_file)
             return -1
         try:
             fp_out = open(self.weight_ldv_file, 'w')
@@ -332,7 +339,7 @@ class SimPoint(object):
         # Format the Simpoint command and run it.
         #
         # import pdb;  pdb.set_trace()
-        cmd = self.simpoint_bin
+        cmd = self.simpoint_bin # Pega path para o binário do simpoint
         if options.ldv:
             cmd += ' -fixedLength on -loadVectorsTxtFmt ' + self.freq_vect_file
         else:
@@ -348,7 +355,11 @@ class SimPoint(object):
             cmd += ' ' + options.simpoint_options
 
         cmd += ' -saveSimpoints ./t.simpoints -saveSimpointWeights ./t.weights -saveLabels t.labels'
-        result = util.RunCmd(cmd, options, '',
+
+        # Roda comando montado, executando simpoint
+        result = util.RunCmd(cmd,
+                             options,
+                             '',
                              concurrent=False,
                              f_stdout=fp_out,
                              f_stderr=subprocess.STDOUT)
@@ -377,9 +388,9 @@ class SimPoint(object):
         # Output and error files
         #
         if options.global_regions:
-          regions_csv_file = options.data_dir[:pos] + '.global.pinpoints.csv'
+            regions_csv_file = options.data_dir[:pos] + '.global.pinpoints.csv'
         else:
-          regions_csv_file = options.data_dir[:pos] + '.pinpoints.csv'
+            regions_csv_file = options.data_dir[:pos] + '.pinpoints.csv'
         try:
             fp_out = open(regions_csv_file, 'w')
         except IOError:
@@ -400,10 +411,10 @@ class SimPoint(object):
         #
         # import pdb;  pdb.set_trace()
         if options.focus_thread != "global":
-          if int(options.focus_thread) < 0:
-            tid = 0
-          else:
-            tid = int(options.focus_thread)
+            if int(options.focus_thread) < 0:
+                tid = 0
+            else:
+                tid = int(options.focus_thread)
 
         # use_orig = True  # Use Chuck's original Perl script
         use_orig = False  # Use regions.py script
@@ -422,27 +433,28 @@ class SimPoint(object):
                 cmd = 'pcregions.py'
                 cmd += ' --label_file t.labels'
                 if options.warmup_factor != '':
-                    cmd += ' --warmup_factor '+ str(options.warmup_factor)
+                    cmd += ' --warmup_factor ' + str(options.warmup_factor)
                 if options.focus_thread != "global":
-                  cmd += ' --tid ' + str(tid)
-                else: 
-                  cmd += ' --tid global' 
+                    cmd += ' --tid ' + str(tid)
+                else:
+                    cmd += ' --tid global'
             else:
                 cmd = self.csv_bin
                 if options.focus_thread != "global":
-                  cmd += ' -f ' + str(tid)
-                else: 
-                  cmd += ' -f global' 
+                    cmd += ' -f ' + str(tid)
+                else:
+                    cmd += ' -f global'
                 cmd += ' --csv_region '
             cmd += ' --bbv_file ' + self.generic_bbv_name + cutoff_suffix
             cmd += ' --region_file t.simpoints' + cutoff_suffix
             cmd += ' --weight_file t.weights' + cutoff_suffix
         msg.PrintMsg('')
-        msg.PrintMsg('cmd='+cmd)
+        msg.PrintMsg('cmd=' + cmd)
         result = util.RunCmd(cmd, options, '', concurrent=False, print_time=False, f_stdout=fp_out, \
                              f_stderr=fp_error)
         msg.PrintMsg(
-            '   NOTE: For this script, problems can be in either the output or stderr files.  Check them both!')
+            '   NOTE: For this script, problems can be in either the output or stderr files.  Check them both!'
+        )
         msg.PrintMsg('      Output file: %s' % (regions_csv_file))
         msg.PrintMsg('      Stderr file: %s\n' % (output_file))
         fp_out.close()
@@ -451,6 +463,7 @@ class SimPoint(object):
         return result, regions_csv_file
 
     def Run(self):
+        # IMPORTANT explicação do que o script faz basicamente:
         """Run the scripts required to run simpoint and generate a region CSV file with the results."""
 
         msg.PrintMsg('')
@@ -492,8 +505,8 @@ class SimPoint(object):
         try:
             f = open(self.generic_bbv_name)
         except IOError:
-            msg.PrintAndExit(
-                'problem opening BBV file: ' + self.generic_bbv_name)
+            msg.PrintAndExit('problem opening BBV file: ' +
+                             self.generic_bbv_name)
         instr_count = 0
         slice_size = 0
         for line in f.readlines():
@@ -517,6 +530,7 @@ class SimPoint(object):
                 '\nInstruction count: ' + locale.format('%14d', int(instr_count), True) + \
                 '\nSlice size:        ' + locale.format('%14d', int(slice_size), True))
 
+        # If else que escolhe se vai usar BBV e LDV ou só BBV
         if options.ldv:
             # Run to generate regions CSV file using both BBV and LDV files.
             #
@@ -527,11 +541,14 @@ class SimPoint(object):
             result = self.NormWeightLDV(options)
             util.CheckResult(
                 result, options,
-                'normalizing and applying weights to LDV with: ' + self.csv_bin)
+                'normalizing and applying weights to LDV with: ' +
+                self.csv_bin)
             result = self.CombineFreqVectFiles(options)
             util.CheckResult(
                 result, options,
                 'scaling and combining BBV and LDV with: ' + self.csv_bin)
+
+            # Roda o simpoint de fato
             result = self.RunSimpoint(options)
             util.CheckResult(
                 result, options,
@@ -539,6 +556,8 @@ class SimPoint(object):
             result, regions_csv_file = self.GenRegionCSVFile(options)
             util.CheckResult(result, options,
                              'creating regions CSV file with: ' + self.csv_bin)
+
+            # Faz output das regiões para arquivo CSV
             msg.PrintMsg('\nRegions CSV file: ' +
                          os.path.join(options.data_dir, regions_csv_file))
         else:
@@ -567,6 +586,7 @@ def main():
     f = SimPoint()
     result = f.Run()
     return result
+
 
 # If module is called in stand along mode, then run it.
 #
